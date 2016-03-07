@@ -1,0 +1,26 @@
+{
+  "name": "tileArtist",
+  "version": "1.0.0",
+  "description": "== README",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "babel-core": "^6.3.15",
+    "babel-loader": "^6.2.0",
+    "babel-preset-react": "^6.3.13",
+    "flux": "^2.1.1",
+    "history": "1.17.x",
+    "react": "^0.14.3",
+    "react-addons-linked-state-mixin": "^0.14.2",
+    "react-bootstrap": "^0.28.1",
+    "react-dom": "^0.14.3",
+    "react-file-input": "^0.2.5",
+    "react-router": "^1.0.0",
+    "webpack": "^1.12.9"
+  }
+}
