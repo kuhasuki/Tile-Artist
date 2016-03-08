@@ -9,7 +9,7 @@ var Button = require('react-bootstrap/lib/Button');
 var Input = require('react-bootstrap/lib/Input');
 var Alert = require('react-bootstrap/lib/Alert');
 
-var UserStore = require('../stores/user_store.js');
+var SessionStore = require('../stores/session_store.js');
 
 var AlertActions = require('../actions/alert_actions.js');
 var Dispatcher = require('../dispatcher/dispatcher');
@@ -31,18 +31,18 @@ var Login = React.createClass({
 
   login: function(){
     Api.login(this.state.name, this.state.password);
-    this.listenerToken = UserStore.addListener(this._getErrors);
+    this.listenerToken = SessionStore.addListener(this._getErrors);
   },
 
   _getErrors: function(){
-    if (UserStore.getError() != '') {
-      this.setState({errors: UserStore.getError()});
+    if (SessionStore.getError() != '') {
+      this.setState({errors: SessionStore.getError()});
     } else {
     }
   },
 
   componentDidMount: function () {
-    this.listenerToken = UserStore.addListener(this._getErrors);    
+    this.listenerToken = SessionStore.addListener(this._getErrors);    
   },
 
   componentWillUnmount: function () {
@@ -57,7 +57,7 @@ var Login = React.createClass({
 
   render: function(){
     return(
-      <li>
+      <div style={{'display':'inline-block'}}>
         <a href="javascript:void(0)" onClick={this.openModal} >Login</a>
         <Modal show={this.state.showModal} onHide={this.closeModal} animation={false}>
           <Modal.Header closeButton>
@@ -76,7 +76,7 @@ var Login = React.createClass({
             <Button onClick={this.login}>Submit</Button>
           </Modal.Body>
         </Modal>
-      </li>
+      </div>
     );
   }
 });

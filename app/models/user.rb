@@ -1,6 +1,6 @@
 class User < ActiveRecord::Base
 	attr_accessor :password
-  validates :name, :password_digest, :session_token, :profile_pic_url, presence: true
+  validates :name, :password_digest, :session_token, presence: true
   validates :name, :session_token, uniqueness: true
   validates :password, length: { minimum: 6, allow_nil: true }
   after_initialize :ensure_session_token
