@@ -37,8 +37,9 @@ var Landing = React.createClass({
     render: function(){
 
       if(this.state.loggedIn) {
+        window.location = "#/home";
         return(
-          <div>loggedIn</div>
+          null
         );
       } else {
         return(

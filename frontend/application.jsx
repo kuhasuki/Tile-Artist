@@ -46,10 +46,10 @@ var TileArtist = React.createClass({
     //   </div>
     // );
     return(
-      <div>
+      <div  style={{'height':'100%'}}>
         <Navigation />
-        <div className="container-fluid">
-          <div className="row">
+        <div className="container-fluid" style={{'height':'100%'}}>
+          <div className="row" style={{'height':'85%'}}>
             {this.props.children}
           </div>
         </div>

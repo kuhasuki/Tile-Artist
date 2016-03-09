@@ -22,3 +22,12 @@
 body{
 	padding-top: 5rem;
 }
+
+html, 
+body {
+    height: 100%;
+}
+
+#tileArtist{
+	height:100%;
+}

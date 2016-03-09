@@ -31,7 +31,7 @@ var NavTools = React.createClass({
   	if(this.state.loggedIn) {
       return(
 		    <ul className="nav navbar-nav">
-		      <li className="active"><a href="#">My Pictures</a></li>
+		      <li><a href="#home">My Pictures</a></li>
 		      <li><a href="#new">New Picture</a></li>
 		      <li><a rel="nofollow" data-method="delete" href="/sessions">Logout</a></li>
 		    </ul>
