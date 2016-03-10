@@ -1,6 +1,9 @@
 var React = require('react');
 var Api = require('../util/api.js');
 
+var SessionStore = require('../stores/session_store.js');
+var PictureStore = require('../stores/picture_store.js');
+
 var ViewPicture = React.createClass({
 	getInitialState() {
 	    return {
@@ -16,11 +19,9 @@ var ViewPicture = React.createClass({
 	},
 	_gotPicture(){
 		var newPic = PictureStore.getPictureById(this.props.params.id);
-		console.log(newPic);
 		this.setState({pic: newPic})
 	},
   render: function(){
-  	console.log(this.state.pic);
   	var percentage = 100 / this.state.pic.size;
     return(
 	    <div style={{'width':'100%', 'height': '100%'}} className="center">
@@ -29,7 +30,6 @@ var ViewPicture = React.createClass({
 	        this.state.pic.grid.map(function(row, idx){
 	        	return(
 		          row.map(function(col, jdx){
-		           	//console.log(col);
 		           	return(
 	                <div style={{'width': percentage + '%', 'height': percentage + '%', 'display':'inline-block', 'padding':'1px'}}>
 	                <div key={idx+jdx} style={{'height': '100%'}}>

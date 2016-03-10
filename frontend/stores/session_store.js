@@ -3,24 +3,15 @@ var Dispatcher = require('../dispatcher/dispatcher.js');
 var SessionStore = new Store(Dispatcher);
 
 var DispatchConstants = require('../constants/dispatch_constants.js');
-var AlertActions = require('../actions/alert_actions.js');
 
 var _error = '';
 var _loggedIn = false;
 var _user = {};
-// var _public_user = {};
 
 SessionStore.updateError = function(error){
   _error = error;
 };
 
-// SessionStore.setPublicUser = function(user){
-//   _public_user = user;
-// };
-
-// SessionStore.getPublicUser = function(){
-//   return _public_user;
-// };
 
 SessionStore.getError = function(){
   return _error;
@@ -58,11 +49,9 @@ SessionStore.loginStatus = function(){
 
 SessionStore.__onDispatch = function (payload) {
   _error = "";
-  console.log(_user);
   switch (payload.actionType) {
     case DispatchConstants.LOGIN_SUCCESS:
       SessionStore.login(payload.user);
-      //AlertActions.success("Welcome back " + payload.user.name, 2000);
       SessionStore.__emitChange();
       break;
     case DispatchConstants.LOGIN_FAILURE:
@@ -70,7 +59,6 @@ SessionStore.__onDispatch = function (payload) {
       SessionStore.__emitChange();
       break;
     case DispatchConstants.REGISTRATION_SUCCESS:
-      //AlertActions.success("Registered Successfully", 2000);
       SessionStore.login(payload.user);
       SessionStore.__emitChange();
       break;
@@ -92,7 +80,5 @@ SessionStore.__onDispatch = function (payload) {
       break;
   }
 };
-
-window.SessionStore = SessionStore;
 
 module.exports = SessionStore

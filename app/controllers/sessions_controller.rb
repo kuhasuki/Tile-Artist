@@ -18,13 +18,11 @@ class SessionsController < ApplicationController
 	    params[:user][:name],
 	    params[:user][:password]
 	  )
-	  #Switch branches
+
     if @user
-      #initiate a new session
       login!(@user)
       render 'show'
     else
-      #flash incorrect password/username combination
       render json: { error: "Incorrect username/ password combination" }
     end
   end

@@ -1,8 +1,6 @@
 var React = require('react');
 
-var Login = require('./login.jsx');
-var Register = require('./register.jsx');
-
+var SessionStore = require('../stores/session_store.js');
 
 var NavTools = React.createClass({
 

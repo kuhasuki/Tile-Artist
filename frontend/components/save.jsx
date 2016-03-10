@@ -11,9 +11,6 @@ var Alert = require('react-bootstrap/lib/Alert');
 
 var PictureStore = require('../stores/picture_store.js');
 
-var AlertActions = require('../actions/alert_actions.js');
-var Dispatcher = require('../dispatcher/dispatcher');
-
 
 var Save = React.createClass({
   mixins: [LinkedStateMixin],
@@ -30,18 +27,14 @@ var Save = React.createClass({
   },
 
   save: function(){
-    console.log(this.state);
     Api.saveNewPicture(this.state.title, this.state.userId, this.state.base, this.state.size, this.state.grid);
   },
 
   _getErrors: function(){
-    console.log("in get errors");
     if (PictureStore.getError() != '') {
       this.setState({errors: PictureStore.getError()});
     } else if(PictureStore.saved()) {
-      console.log('is saved');
       var pic = PictureStore.getSavedPicture();
-      console.log(pic);
       this.listenerToken.remove();
       window.location.href = "#/pic/" + pic.id;
     } else {
@@ -67,7 +60,6 @@ var Save = React.createClass({
     this.setState({grid: nextProps.grid, userId: nextProps.user.id, size: nextProps.gridSize});
   },
   render: function(){
-    console.log(this.state);
     return(
       <div style={{'display':'inline-block'}}>
         <a href="javascript:void(0)" onClick={this.openModal} >Save</a>

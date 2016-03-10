@@ -11,9 +11,7 @@ var Guest = React.createClass({
 
 	render: function() {
 		return (
-			<li>
-        <a href="javascript:void(0)" onClick={this.guestLogin} >Guest Login</a>
-      </li>
+      <a href="javascript:void(0)" onClick={this.guestLogin} >Guest Login</a>
 		);
 	}
 

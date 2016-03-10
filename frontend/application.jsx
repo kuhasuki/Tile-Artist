@@ -8,43 +8,19 @@ var IndexRoute = require('react-router').IndexRoute;
 var Button = require('react-bootstrap/lib/Button');
 
 var Navigation = require('./components/nav.jsx');
-var Drawer = require('./components/drawer.jsx');
 var Landing = require('./components/landing.jsx');
 var Home = require('./components/home.jsx');
 var NewPicture = require('./components/new_picture.jsx');
 var ViewPicture = require('./components/view_picture.jsx');
 var EditPicture = require('./components/edit_picture.jsx');
-// var Content = require('./components/content.jsx');
-// var Player = require('./components/player.jsx');
-// var Profile = require('./components/profile.jsx');
-// var Test = require('./components/test.jsx');
-// var TrackUpload = require('./components/track_upload.jsx');
-// var ImageUpload = require('./components/image_upload.jsx');
-// var Track = require('./components/track.jsx');
-// var MyTracks = require('./components/my_tracks.jsx');
-// var Explore = require('./components/explore.jsx');
 
 var SessionStore = require('./stores/session_store.js');
-// var AlertStore = require('./stores/alert_store.js');
-// var Api = require('./util/api.js');
-
-// var AlertActions = require('./actions/alert_actions.js');
-// var Dispatcher = require('./dispatcher/dispatcher.js');
 
 var TileArtist = React.createClass({
   componentWillMount() {
       Api.verifySession();  
   },
   render: function(){
-    // return(
-    //   <div>
-    //     <Navigation />
-    //     {this.props.children}
-    //     <br></br>
-    //     <br></br>
-    //     <Player />
-    //   </div>
-    // );
     return(
       <div  style={{'height':'100%'}}>
         <Navigation />
@@ -61,11 +37,7 @@ var TileArtist = React.createClass({
 function requireAuth(nextState, replaceState ){
   Api.verifySession();
   if(!SessionStore.isLoggedIn()){
-    replaceState({ nextPathname: nextState.location.pathname }, '/')
-    AlertActions.danger("You must be logged in to do that", 2000);  
-  } else {
-    sessionUser = SessionStore.getUser();
-    window.sessionUser = sessionUser;
+    replaceState({ nextPathname: nextState.location.pathname }, '/')  
   }
 }
 

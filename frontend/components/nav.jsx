@@ -1,14 +1,8 @@
 var ReactDOM = require('react-dom');
 var React = require('react');
-
-
 var SessionStore = require('../stores/session_store.js');
 
-var AlertActions = require('../actions/alert_actions.js');
-
-var Header = require('./header.jsx');
 var NavTools = require('./nav_tools.jsx');
-
 
 var Navigation = React.createClass({
   render: function(){
