@@ -58,6 +58,7 @@ SessionStore.loginStatus = function(){
 
 SessionStore.__onDispatch = function (payload) {
   _error = "";
+  console.log(_user);
   switch (payload.actionType) {
     case DispatchConstants.LOGIN_SUCCESS:
       SessionStore.login(payload.user);

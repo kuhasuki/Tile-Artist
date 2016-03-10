@@ -27,6 +27,8 @@ var NavTools = React.createClass({
     })
   },
 
+
+
   render: function(){
   	if(this.state.loggedIn) {
       return(

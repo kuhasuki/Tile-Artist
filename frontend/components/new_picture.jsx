@@ -2,6 +2,10 @@ var ReactDOM = require('react-dom');
 var React = require('react');
 var LinkedStateMixin = require('react-addons-linked-state-mixin');
 
+var Save = require('./save.jsx');
+
+var SessionStore = require('../stores/session_store.js');
+
 function getRandColor(brightness){
     //6 levels of brightness from 0 to 5, 0 being the darkest
     var rgb = [Math.random() * 256, Math.random() * 256, Math.random() * 256];
@@ -32,15 +36,17 @@ var NewPicture = React.createClass({
   },
 
    _onChange(e) {
-    this.setState({ gridSize: e.target.value, grid: this.buildGrid(e.target.value) });
+    newSize = parseInt(e.target.value);
+    console.log(newSize);
+    console.log(e.target.value);
+    this.setState({ gridSize: newSize, grid: this.buildGrid(e.target.value) });
   },
 
   _toggleColor(col, idx, jdx) {
-    console.log(col);
-    console.log(idx);
-    console.log(jdx);
+
     var newGrid = this.state.grid.slice();
     var newCell = {};
+
     if(col.on === false){
       newCell.on = true;
       newCell.color = getRandColor(5);
@@ -50,22 +56,18 @@ var NewPicture = React.createClass({
     }
     newGrid[idx][jdx] = newCell;
     this.setState({ grid: newGrid});
+
   },
 
-  componentDidMount() {
-    buildGrid(1);
-    this.forceUpdate()
-  },
 
   render: function(){
-    //console.log(this.state.gridSize);
-    //console.log(this.props);
     var percentage = 100 / this.state.gridSize;
     return(
     <div className='col-xs-12 center' style={{'backgroundColor': 'white', 'height':'100%'}}>
       <h2>Create a New Picture</h2>
-     	<label>Size
-        <input type="number" min="1" max="25" onChange={this._onChange} />
+     	<label>Size&nbsp;&nbsp;
+        <input type="number" min="1" max="25" onChange={this._onChange} />&nbsp;&nbsp;&nbsp;
+        <Save grid={this.state.grid} base={this.state.base} gridSize={this.state.gridSize} user={SessionStore.getUser()} />
       </label>
       <br></br>
       {

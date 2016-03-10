@@ -24,7 +24,7 @@ var EditPicture = require('./components/edit_picture.jsx');
 // var MyTracks = require('./components/my_tracks.jsx');
 // var Explore = require('./components/explore.jsx');
 
-// var UserStore = require('./stores/user_store.js');
+var SessionStore = require('./stores/session_store.js');
 // var AlertStore = require('./stores/alert_store.js');
 // var Api = require('./util/api.js');
 
@@ -63,7 +63,10 @@ function requireAuth(nextState, replaceState ){
   if(!SessionStore.isLoggedIn()){
     replaceState({ nextPathname: nextState.location.pathname }, '/')
     AlertActions.danger("You must be logged in to do that", 2000);  
-  } 
+  } else {
+    sessionUser = SessionStore.getUser();
+    window.sessionUser = sessionUser;
+  }
 }
 
 document.addEventListener("DOMContentLoaded", function () {
@@ -72,7 +75,7 @@ document.addEventListener("DOMContentLoaded", function () {
   <Router>
     <Route component={TileArtist} >
       <Route path="/" onClick={this._onClick} component={Landing} />
-      <Route path="/home" component={Home} onEnter={requireAuth}/>
+      <Route path="/home"component={Home} onEnter={requireAuth}/>
       <Route path="/new" component={NewPicture} onEnter={requireAuth}/>
       <Route path="pic/:id" component={ViewPicture} />
       <Route path="pic/:id/edit" component={EditPicture} onEnter={requireAuth}/>

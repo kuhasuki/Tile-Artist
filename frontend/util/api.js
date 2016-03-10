@@ -20,6 +20,26 @@ Api = {
   	});
   },
 
+  saveNewPicture: function(title, userId, base, size, grid){
+    $.post('/pictures', {"picture": {"title": title, "user_id": userId, "base": base, "size": size, "grid": JSON.stringify(grid)}}, function(data){
+      ApiActions.saveAttempt(data);
+    });
+  },
+
+  fetchPicById: function(id){
+    $.get('/pic/' + id, {}, function(data){
+      ApiActions.fetchPicById(data);
+    });
+  },
+
+  fetchPicsById: function(id){
+    $.get('/pics/' + id, {}, function(data){
+      ApiActions.fetchPicsById(data);
+    });
+  },
+
+
+
   fetchTracks: function(){
     $.get('/api/tracks', {}, function(data){
       ApiActions.fetchTracks(data);

@@ -38,14 +38,27 @@ class PicturesController < ApplicationController
 	end
 
 	def index
-		@pictures = User.find(params[:id]).Picture.all()
-		render json: @pictures
+		@user = User.find(params[:id])
+
+		if @user 
+			if @user.pictures.any?
+				@pictures = @user.pictures.all()
+				render json: @pictures
+				return
+			else
+				render json: {error: "user has no pictures"}, status: 400
+				return
+			end
+		end
+		render json: {error: "no such user"}, status: 400
+
 	end
 
 	private
 
 	def picture_params
-    params.require(:picture).permit(:title, :user_id, :size, :grid)
+		# params[:picture] = Marshal.load( Marshal.dump(params[:picture]) )
+    params.require(:picture).permit(:title, :user_id, :size, :base, :grid)
   end
 
 end

@@ -58,8 +58,8 @@
 	var Landing = __webpack_require__(370);
 	var Home = __webpack_require__(371);
 	var NewPicture = __webpack_require__(372);
-	var ViewPicture = __webpack_require__(373);
-	var EditPicture = __webpack_require__(374);
+	var ViewPicture = __webpack_require__(375);
+	var EditPicture = __webpack_require__(376);
 	// var Content = require('./components/content.jsx');
 	// var Player = require('./components/player.jsx');
 	// var Profile = require('./components/profile.jsx');
@@ -70,7 +70,7 @@
 	// var MyTracks = require('./components/my_tracks.jsx');
 	// var Explore = require('./components/explore.jsx');
 
-	// var UserStore = require('./stores/user_store.js');
+	var SessionStore = __webpack_require__(240);
 	// var AlertStore = require('./stores/alert_store.js');
 	// var Api = require('./util/api.js');
 
@@ -115,6 +115,9 @@
 	  if (!SessionStore.isLoggedIn()) {
 	    replaceState({ nextPathname: nextState.location.pathname }, '/');
 	    AlertActions.danger("You must be logged in to do that", 2000);
+	  } else {
+	    sessionUser = SessionStore.getUser();
+	    window.sessionUser = sessionUser;
 	  }
 	}
 
@@ -25287,6 +25290,7 @@
 
 	SessionStore.__onDispatch = function (payload) {
 	  _error = "";
+	  console.log(_user);
 	  switch (payload.actionType) {
 	    case DispatchConstants.LOGIN_SUCCESS:
 	      SessionStore.login(payload.user);
@@ -32102,6 +32106,12 @@
 	  ALERT_INFO: "ALERT_INFO",
 	  ALERT_WARNING: "ALERT_WARNING",
 	  ALERT_DANGER: "ALERT_DANGER",
+	  SAVE_SUCCESS: "SAVE_SUCCESS",
+	  SAVE_FAILURE: "SAVE_FAILURE",
+	  FETCH_SUCCESS: "FETCH_SUCCESS",
+	  FETCH_FAILURE: "FETCH_FAILURE",
+	  PICS_FETCH_SUCCESS: "PICS_FETCH_SUCCESS",
+	  PICS_FETCH_FAILURE: "PICS_FETCH_FAILURE",
 	  UPLOAD_SUCCESS: "UPLOAD_SUCCESS",
 	  UPLOAD_FAILURE: "UPLOAD_FAILURE",
 	  ALERT_CLEAR: "ALERT_CLEAR",
@@ -32685,6 +32695,24 @@
 	    });
 	  },
 
+	  saveNewPicture: function (title, userId, base, size, grid) {
+	    $.post('/pictures', { "picture": { "title": title, "user_id": userId, "base": base, "size": size, "grid": JSON.stringify(grid) } }, function (data) {
+	      ApiActions.saveAttempt(data);
+	    });
+	  },
+
+	  fetchPicById: function (id) {
+	    $.get('/pic/' + id, {}, function (data) {
+	      ApiActions.fetchPicById(data);
+	    });
+	  },
+
+	  fetchPicsById: function (id) {
+	    $.get('/pics/' + id, {}, function (data) {
+	      ApiActions.fetchPicsById(data);
+	    });
+	  },
+
 	  fetchTracks: function () {
 	    $.get('/api/tracks', {}, function (data) {
 	      ApiActions.fetchTracks(data);
@@ -32875,6 +32903,48 @@
 	      Dispatcher.dispatch({
 	        actionType: DispatchConstants.LOGGED_IN,
 	        user: data
+	      });
+	    }
+	  },
+
+	  saveAttempt: function (data) {
+	    if (data.hasOwnProperty("error")) {
+	      Dispatcher.dispatch({
+	        actionType: DispatchConstants.SAVE_FAILURE,
+	        error: data.error
+	      });
+	    } else {
+	      Dispatcher.dispatch({
+	        actionType: DispatchConstants.SAVE_SUCCESS,
+	        picture: data
+	      });
+	    }
+	  },
+
+	  fetchPicById: function (data) {
+	    if (data.hasOwnProperty("error")) {
+	      Dispatcher.dispatch({
+	        actionType: DispatchConstants.FETCH_FAILURE,
+	        error: data.error
+	      });
+	    } else {
+	      Dispatcher.dispatch({
+	        actionType: DispatchConstants.FETCH_SUCCESS,
+	        picture: data
+	      });
+	    }
+	  },
+
+	  fetchPicsById: function (data) {
+	    if (data.hasOwnProperty("error")) {
+	      Dispatcher.dispatch({
+	        actionType: DispatchConstants.PICS_FETCH_FAILURE,
+	        error: data.error
+	      });
+	    } else {
+	      Dispatcher.dispatch({
+	        actionType: DispatchConstants.PICS_FETCH_SUCCESS,
+	        pictures: data
 	      });
 	    }
 	  },
@@ -38142,21 +38212,84 @@
 /***/ function(module, exports, __webpack_require__) {
 
 	var React = __webpack_require__(147);
+	var Api = __webpack_require__(271);
+
+	var SessionStore = __webpack_require__(240);
+	var PictureStore = __webpack_require__(374);
 
 	var Home = React.createClass({
-	  displayName: 'Home',
+			displayName: 'Home',
 
-	  render: function () {
-	    return React.createElement(
-	      'div',
-	      null,
-	      React.createElement(
-	        'h1',
-	        null,
-	        'Home'
-	      )
-	    );
-	  }
+			getInitialState() {
+					return {
+							user: {},
+							pics: []
+					};
+			},
+			componentDidMount() {
+					Api.verifySession();
+					this.listenerToken = SessionStore.addListener(this._gotUser);
+					console.log(this.props.route);
+			},
+			componentWillUnmount() {
+					this.listenerToken.remove();
+			},
+			componentWillReceiveProps(nextProps) {
+					console.log(this.props);
+			},
+			_gotPictures() {
+					var newPics = PictureStore.getPicturesById(this.state.user.id);
+					console.log(newPics);
+					this.setState({ pics: newPics });
+			},
+
+			_gotUser() {
+					var newUser = SessionStore.getUser();
+					this.setState({
+							user: newUser
+					});
+					Api.fetchPicsById(newUser.id);
+					this.listenerToken2 = PictureStore.addListener(this._gotPictures);
+			},
+
+			componentWillUnmount() {
+					this.listenerToken.remove();
+					this.listenerToken2.remove();
+			},
+
+			render: function () {
+					console.log(this.state.pics);
+					if (this.state.user.id != undefined) {
+							return React.createElement(
+									'div',
+									{ style: { 'width': '100%', 'height': '100%', 'paddingTop': '2px' }, className: 'center' },
+									this.state.pics.map(function (pic, idx) {
+
+											return React.createElement(
+													'div',
+													{ className: 'col-xs-4', style: { 'height': '100px', 'padding': '2px' } },
+													React.createElement(
+															'div',
+															{ key: idx, style: { 'height': '100%' } },
+															React.createElement(
+																	'div',
+																	{ style: { 'width': '100%', 'height': '100%', 'backgroundColor': pic.base } },
+																	React.createElement(
+																			'a',
+																			{ style: { 'width': '100%', 'height': '100%', 'fontSize': '30px', 'textDecoration': 'none', 'color': 'black' }, className: 'btn', href: "#/pic/" + pic.id },
+																			' ',
+																			pic.title,
+																			' '
+																	)
+															)
+													)
+											);
+									}.bind(this))
+							);
+					} else {
+							return null;
+					}
+			}
 	});
 
 	module.exports = Home;
@@ -38168,6 +38301,10 @@
 	var ReactDOM = __webpack_require__(1);
 	var React = __webpack_require__(147);
 	var LinkedStateMixin = __webpack_require__(267);
+
+	var Save = __webpack_require__(373);
+
+	var SessionStore = __webpack_require__(240);
 
 	function getRandColor(brightness) {
 	  //6 levels of brightness from 0 to 5, 0 being the darkest
@@ -38203,15 +38340,17 @@
 	  },
 
 	  _onChange(e) {
-	    this.setState({ gridSize: e.target.value, grid: this.buildGrid(e.target.value) });
+	    newSize = parseInt(e.target.value);
+	    console.log(newSize);
+	    console.log(e.target.value);
+	    this.setState({ gridSize: newSize, grid: this.buildGrid(e.target.value) });
 	  },
 
 	  _toggleColor(col, idx, jdx) {
-	    console.log(col);
-	    console.log(idx);
-	    console.log(jdx);
+
 	    var newGrid = this.state.grid.slice();
 	    var newCell = {};
+
 	    if (col.on === false) {
 	      newCell.on = true;
 	      newCell.color = getRandColor(5);
@@ -38223,14 +38362,7 @@
 	    this.setState({ grid: newGrid });
 	  },
 
-	  componentDidMount() {
-	    buildGrid(1);
-	    this.forceUpdate();
-	  },
-
 	  render: function () {
-	    //console.log(this.state.gridSize);
-	    //console.log(this.props);
 	    var percentage = 100 / this.state.gridSize;
 	    return React.createElement(
 	      'div',
@@ -38243,8 +38375,10 @@
 	      React.createElement(
 	        'label',
 	        null,
-	        'Size',
-	        React.createElement('input', { type: 'number', min: '1', max: '25', onChange: this._onChange })
+	        'Size  ',
+	        React.createElement('input', { type: 'number', min: '1', max: '25', onChange: this._onChange }),
+	        '   ',
+	        React.createElement(Save, { grid: this.state.grid, base: this.state.base, gridSize: this.state.gridSize, user: SessionStore.getUser() })
 	      ),
 	      React.createElement('br', null),
 	      this.state.grid.map(function (row, idx) {
@@ -38275,28 +38409,353 @@
 /* 373 */
 /***/ function(module, exports, __webpack_require__) {
 
+	'use strict';
+
+	var ReactDOM = __webpack_require__(1);
 	var React = __webpack_require__(147);
+	var LinkedStateMixin = __webpack_require__(267);
 
-	var ViewPicture = React.createClass({
-	  displayName: 'ViewPicture',
+	var Api = __webpack_require__(271);
+	var Modal = __webpack_require__(273);
+	var Button = __webpack_require__(208);
+	var Input = __webpack_require__(357);
+	var Alert = __webpack_require__(367);
 
+	var PictureStore = __webpack_require__(374);
+
+	var AlertActions = __webpack_require__(263);
+	var Dispatcher = __webpack_require__(259);
+
+	var Save = React.createClass({
+	  displayName: 'Save',
+
+	  mixins: [LinkedStateMixin],
+	  getInitialState: function () {
+	    return { title: '', userId: '', base: this.props.base, size: this.props.gridSize, grid: {}, errors: [] };
+	  },
+
+	  closeModal: function () {
+	    this.setState({ showModal: false, errors: '' });
+	  },
+
+	  openModal: function () {
+	    this.setState({ showModal: true });
+	  },
+
+	  save: function () {
+	    console.log(this.state);
+	    Api.saveNewPicture(this.state.title, this.state.userId, this.state.base, this.state.size, this.state.grid);
+	    this.listenerToken = PictureStore.addListener(this._getErrors);
+	  },
+
+	  _getErrors: function () {
+	    console.log("in get errors");
+	    if (PictureStore.getError() != '') {
+	      this.setState({ errors: PictureStore.getError() });
+	    } else if (PictureStore.saved()) {
+	      console.log('is saved');
+	      var pic = PictureStore.getSavedPicture();
+	      console.log(pic);
+	      this.listenerToken.remove();
+	      window.location.href = "#/pic/" + pic.id;
+	    }
+	  },
+
+	  componentDidMount: function () {
+	    this.listenerToken = PictureStore.addListener(this._getErrors);
+	  },
+
+	  componentWillUnmount: function () {
+	    this.listenerToken.remove();
+	  },
+
+	  enterSubmit: function (event) {
+	    if (event.keyCode === 13) {
+	      this.login();
+	    }
+	  },
+
+	  componentWillReceiveProps(nextProps) {
+	    this.setState({ grid: nextProps.grid, userId: nextProps.user.id, size: nextProps.gridSize });
+	  },
 	  render: function () {
+	    console.log(this.state);
 	    return React.createElement(
 	      'div',
-	      null,
+	      { style: { 'display': 'inline-block' } },
 	      React.createElement(
-	        'h1',
-	        null,
-	        'ViewPicture'
+	        'a',
+	        { href: 'javascript:void(0)', onClick: this.openModal },
+	        'Save'
+	      ),
+	      React.createElement(
+	        Modal,
+	        { show: this.state.showModal, onHide: this.closeModal, animation: false },
+	        React.createElement(
+	          Modal.Header,
+	          { closeButton: true },
+	          React.createElement(
+	            Modal.Title,
+	            null,
+	            'Save Your Picture'
+	          )
+	        ),
+	        React.createElement(
+	          Modal.Body,
+	          null,
+	          this.state.errors.length >= 1 ? React.createElement(
+	            Alert,
+	            { bsStyle: 'danger' },
+	            this.state.errors
+	          ) : "",
+	          React.createElement(
+	            'label',
+	            null,
+	            'Title',
+	            React.createElement(Input, { type: 'text', valueLink: this.linkState('title') })
+	          ),
+	          React.createElement('br', null),
+	          React.createElement(
+	            Button,
+	            { onClick: this.save },
+	            'Submit'
+	          )
+	        )
 	      )
 	    );
 	  }
 	});
 
-	module.exports = ViewPicture;
+	module.exports = Save;
 
 /***/ },
 /* 374 */
+/***/ function(module, exports, __webpack_require__) {
+
+	var Store = __webpack_require__(241).Store;
+	var Dispatcher = __webpack_require__(259);
+	var PictureStore = new Store(Dispatcher);
+
+	var DispatchConstants = __webpack_require__(262);
+	var AlertActions = __webpack_require__(263);
+
+	var _error = '';
+	var _picture = { grid: [] };
+	var _saved = false;
+	var _pictures = [];
+	// var _public_user = {};
+
+	PictureStore.updateError = function (error) {
+	  _error = error;
+	  console.log("got error");
+	  console.log(error);
+	  _saved = false;
+	};
+
+	// PictureStore.setPublicUser = function(user){
+	//   _public_user = user;
+	// };
+
+	// PictureStore.getPublicUser = function(){
+	//   return _public_user;
+	// };
+
+	PictureStore.getError = function () {
+
+	  return _error;
+	};
+
+	PictureStore.login = function (user) {
+	  _loggedIn = true;
+	  _user = user;
+	  localStorage.token = user.session_token;
+	};
+
+	PictureStore.save = function (picture) {
+	  console.log("in save");
+	  _picture = picture;
+	  _pictures.push(picture);
+	  _saved = true;
+	};
+
+	PictureStore.removeDuplicates = function () {
+	  console.log("start");
+	  console.log(_pictures);
+	  _pictures.forEach(function (picture, i) {
+	    for (var j = i + 1; j < _pictures.length; j++) {
+
+	      if (picture.id == _pictures[j].id) _pictures.splice(i, 1);
+	    }
+	  });
+	  console.log("end");
+	  console.log(_pictures);
+	};
+
+	PictureStore.addPic = function (picture) {
+	  _pictures.push(picture);
+	};
+
+	PictureStore.addPics = function (pictures) {
+	  jQuery.extend(_pictures, pictures);
+	};
+
+	PictureStore.getPictureById = function (id) {
+	  id = parseInt(id);
+	  console.log(id);
+
+	  console.log(_pictures);
+	  _pictures.forEach(function (picture) {
+	    console.log(picture.id);
+	    if (picture.id === id) {
+	      console.log(picture.grid);
+	      _picture = picture;
+	    } else {
+	      console.log("not found");
+	    }
+	  });
+	  return _picture;
+	};
+
+	PictureStore.getPicturesById = function (id) {
+	  id = parseInt(id);
+	  var matches = [];
+	  this.removeDuplicates(_pictures);
+	  _pictures.forEach(function (picture) {
+	    console.log(picture.id);
+	    if (picture.user_id === id) {
+	      console.log(picture.grid);
+	      matches.push(picture);
+	    } else {
+	      console.log("not found");
+	    }
+	  });
+	  return matches;
+	};
+
+	PictureStore.getSavedPicture = function () {
+	  return _picture;
+	};
+
+	PictureStore.saved = function () {
+	  return _saved;
+	};
+
+	PictureStore.isLoggedIn = function () {
+	  if (localStorage.token) {
+	    return !!localStorage.token;
+	  } else {
+	    return false;
+	  }
+	};
+
+	PictureStore.loginStatus = function () {
+	  return _loggedIn;
+	};
+
+	PictureStore.__onDispatch = function (payload) {
+	  _saved = false;
+	  switch (payload.actionType) {
+	    case DispatchConstants.SAVE_SUCCESS:
+	      PictureStore.save(payload.picture);
+	      //AlertActions.success("Welcome back " + payload.user.name, 2000);
+	      PictureStore.__emitChange();
+	      break;
+	    case DispatchConstants.SAVE_FAILURE:
+	      console.log(payload.error);
+	      PictureStore.updateError(payload.error);
+	      PictureStore.__emitChange();
+	      break;
+	    case DispatchConstants.FETCH_SUCCESS:
+	      console.log(payload.picture);
+	      PictureStore.addPic(payload.picture);
+	      PictureStore.__emitChange();
+	      break;
+	    case DispatchConstants.FETCH_FAILURE:
+	      console.log(payload.error);
+	      PictureStore.updateError(payload.error);
+	      PictureStore.__emitChange();
+	      break;
+	    case DispatchConstants.PICS_FETCH_SUCCESS:
+	      console.log(payload.picture);
+	      PictureStore.addPics(payload.pictures);
+	      PictureStore.__emitChange();
+	      break;
+	    case DispatchConstants.PICS_FETCH_FAILURE:
+	      console.log(payload.error);
+	      PictureStore.updateError(payload.error);
+	      PictureStore.__emitChange();
+	      break;
+	  }
+	};
+
+	window.PictureStore = PictureStore;
+
+	module.exports = PictureStore;
+
+/***/ },
+/* 375 */
+/***/ function(module, exports, __webpack_require__) {
+
+	var React = __webpack_require__(147);
+	var Api = __webpack_require__(271);
+
+	var ViewPicture = React.createClass({
+		displayName: 'ViewPicture',
+
+		getInitialState() {
+			return {
+				pic: { grid: [], size: 0, title: 'Picture' }
+			};
+		},
+		componentDidMount() {
+			this.listenerToken = PictureStore.addListener(this._gotPicture);
+			Api.fetchPicById(this.props.params.id);
+		},
+		componentWillUnmount() {
+			this.listenerToken.remove();
+		},
+		_gotPicture() {
+			var newPic = PictureStore.getPictureById(this.props.params.id);
+			console.log(newPic);
+			this.setState({ pic: newPic });
+		},
+		render: function () {
+			console.log(this.state.pic);
+			var percentage = 100 / this.state.pic.size;
+			return React.createElement(
+				'div',
+				{ style: { 'width': '100%', 'height': '100%' }, className: 'center' },
+				React.createElement(
+					'h1',
+					null,
+					this.state.pic.title
+				),
+				this.state.pic.grid.map(function (row, idx) {
+					return row.map(function (col, jdx) {
+						//console.log(col);
+						return React.createElement(
+							'div',
+							{ style: { 'width': percentage + '%', 'height': percentage + '%', 'display': 'inline-block', 'padding': '1px' } },
+							React.createElement(
+								'div',
+								{ key: idx + jdx, style: { 'height': '100%' } },
+								React.createElement(
+									'div',
+									{ style: { 'width': '100%', 'height': '100%', 'backgroundColor': col.color } },
+									' '
+								)
+							)
+						);
+					}.bind(this));
+				}.bind(this))
+			);
+		}
+	});
+
+	module.exports = ViewPicture;
+
+/***/ },
+/* 376 */
 /***/ function(module, exports, __webpack_require__) {
 
 	var React = __webpack_require__(147);

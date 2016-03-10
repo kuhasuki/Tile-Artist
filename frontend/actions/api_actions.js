@@ -50,6 +50,57 @@ var ApiActions = {
     }
   },
 
+  saveAttempt: function(data){
+    if(data.hasOwnProperty("error")){
+      Dispatcher.dispatch({
+        actionType: DispatchConstants.SAVE_FAILURE,
+        error: data.error
+      });
+
+    } else {
+      Dispatcher.dispatch({
+        actionType: DispatchConstants.SAVE_SUCCESS,
+        picture: data
+      });
+
+    }
+  },
+
+  fetchPicById: function(data){
+    if(data.hasOwnProperty("error")){
+      Dispatcher.dispatch({
+        actionType: DispatchConstants.FETCH_FAILURE,
+        error: data.error
+      });
+
+    } else {
+      Dispatcher.dispatch({
+        actionType: DispatchConstants.FETCH_SUCCESS,
+        picture: data
+      });
+    }
+  },
+
+
+  fetchPicsById: function(data){
+    if(data.hasOwnProperty("error")){
+      Dispatcher.dispatch({
+        actionType: DispatchConstants.PICS_FETCH_FAILURE,
+        error: data.error
+      });
+
+    } else {
+      Dispatcher.dispatch({
+        actionType: DispatchConstants.PICS_FETCH_SUCCESS,
+        pictures: data
+      });
+    }
+  },
+
+
+
+
+
   uploadSuccess: function(data){
     Dispatcher.dispatch({
       actionType: DispatchConstants.UPLOAD_SUCCESS,
