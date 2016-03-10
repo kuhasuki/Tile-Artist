@@ -32,7 +32,6 @@ var Save = React.createClass({
   save: function(){
     console.log(this.state);
     Api.saveNewPicture(this.state.title, this.state.userId, this.state.base, this.state.size, this.state.grid);
-    this.listenerToken = PictureStore.addListener(this._getErrors);
   },
 
   _getErrors: function(){
@@ -45,6 +44,8 @@ var Save = React.createClass({
       console.log(pic);
       this.listenerToken.remove();
       window.location.href = "#/pic/" + pic.id;
+    } else {
+      this.setState({errors: []});
     }
   },
 
@@ -62,7 +63,7 @@ var Save = React.createClass({
     }
   },
 
-  componentWillReceiveProps(nextProps) {
+  componentWillReceiveProps: function(nextProps) {
     this.setState({grid: nextProps.grid, userId: nextProps.user.id, size: nextProps.gridSize});
   },
   render: function(){
@@ -75,7 +76,7 @@ var Save = React.createClass({
             <Modal.Title>Save Your Picture</Modal.Title>
           </Modal.Header>
           <Modal.Body>
-            {this.state.errors.length >= 1 ? <Alert bsStyle="danger">{this.state.errors}</Alert> : "" }
+            {this.state.errors.length >= 1 ? <Alert bsStyle="danger">{this.state.errors.map(function(error){return(<p>{error}</p>)})}</Alert> : "" }
             <label>Title
             <Input type="text" valueLink={this.linkState('title')}/>
             </label>

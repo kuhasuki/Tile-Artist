@@ -17,9 +17,6 @@ var Home = React.createClass({
 	    console.log(this.props.route);
 
 	},
-	componentWillUnmount() {
-	  this.listenerToken.remove();  
-	},
 	componentWillReceiveProps(nextProps) {
 	       console.log(this.props);
 	},
@@ -34,7 +31,8 @@ var Home = React.createClass({
 		this.setState({
       user: newUser
     })
-    Api.fetchPicsById(newUser.id)
+    Api.fetchPicsById(newUser.id);
+    this.listenerToken.remove();
     this.listenerToken2 = PictureStore.addListener(this._gotPictures);
 
 	},
@@ -50,14 +48,15 @@ var Home = React.createClass({
   	if(this.state.user.id != undefined){
     	return(
 	    	<div style={{'width':'100%', 'height': '100%', 'paddingTop' : '2px'}} className="center">
+	    	<h2>All of your pictures!</h2>
 	     		{
 	        this.state.pics.map(function(pic, idx){
 	        	
 		        return(
 
 
-			                <div className="col-xs-4" style={{'height': '100px', 'padding':'2px'}}>
-			    	            <div key={idx} style={{'height': '100%'}}>
+			                <div key={idx} className="col-xs-4" style={{'height': '100px', 'padding':'2px'}}>
+			    	            <div style={{'height': '100%'}}>
 	                  			<div style={{'width':'100%', 'height': '100%', 'backgroundColor':  pic.base}} >
 	                    			<a style={{'width':'100%', 'height': '100%', 'fontSize' : '30px', 'textDecoration' : 'none', 'color' : 'black'}} className="btn" href={"#/pic/" + pic.id}> {pic.title} </a>
 	                  			</div>

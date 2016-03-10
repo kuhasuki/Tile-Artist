@@ -5,7 +5,7 @@ class PicturesController < ApplicationController
 		if @picture.save
 			render json: @picture
 		else
-			render json: @picture.errors.full_messages, status: 400
+			render json: {error: @picture.errors.full_messages}
 		end
 	end
 

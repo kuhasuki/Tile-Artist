@@ -47,15 +47,16 @@ PictureStore.save = function(picture){
 PictureStore.removeDuplicates = function(){
   console.log("start");
   console.log(_pictures);
+  var newPictures = _pictures.slice();
+  console.log('newpics', newPictures);
  _pictures.forEach(function(picture, i){
     for(var j = i + 1; j < _pictures.length; j++){
 
       if(picture.id == _pictures[j].id)
-        _pictures.splice(i,1);
+        newPictures.splice(j,1);
     }
   });
- console.log("end");
- console.log(_pictures);
+  _pictures = newPictures;
 };
 
 
@@ -124,6 +125,7 @@ PictureStore.loginStatus = function(){
 
 PictureStore.__onDispatch = function (payload) {
   _saved = false;
+  _error = '';
   switch (payload.actionType) {
     case DispatchConstants.SAVE_SUCCESS:
       PictureStore.save(payload.picture);
