@@ -32150,6 +32150,9 @@
 	var ApiActions = __webpack_require__(266);
 	var SessionStore = __webpack_require__(240);
 
+	var Login = __webpack_require__(372);
+	var Register = __webpack_require__(373);
+
 	var Landing = React.createClass({
 	  displayName: 'Landing',
 
@@ -38033,6 +38036,240 @@
 	});
 
 	module.exports = EditPicture;
+
+/***/ },
+/* 372 */
+/***/ function(module, exports, __webpack_require__) {
+
+	'use strict';
+
+	var ReactDOM = __webpack_require__(1);
+	var React = __webpack_require__(147);
+	var LinkedStateMixin = __webpack_require__(270);
+
+	var Api = __webpack_require__(265);
+	var Modal = __webpack_require__(275);
+	var Button = __webpack_require__(208);
+	var Input = __webpack_require__(359);
+	var Alert = __webpack_require__(369);
+
+	var SessionStore = __webpack_require__(240);
+
+	var Dispatcher = __webpack_require__(259);
+
+	var Login = React.createClass({
+	  displayName: 'Login',
+
+	  mixins: [LinkedStateMixin],
+	  getInitialState: function () {
+	    return { name: '', password: '', errors: '', showModal: false };
+	  },
+
+	  closeModal: function () {
+	    this.setState({ showModal: false, errors: '' });
+	  },
+
+	  openModal: function () {
+	    this.setState({ showModal: true });
+	  },
+
+	  login: function () {
+	    Api.login(this.state.name, this.state.password);
+	    this.listenerToken = SessionStore.addListener(this._getErrors);
+	  },
+
+	  _getErrors: function () {
+	    if (SessionStore.getError() != '') {
+	      this.setState({ errors: SessionStore.getError() });
+	    } else {}
+	  },
+
+	  componentDidMount: function () {
+	    this.listenerToken = SessionStore.addListener(this._getErrors);
+	  },
+
+	  componentWillUnmount: function () {
+	    this.listenerToken.remove();
+	  },
+
+	  enterSubmit: function (event) {
+	    if (event.keyCode === 13) {
+	      this.login();
+	    }
+	  },
+
+	  render: function () {
+	    return React.createElement(
+	      'div',
+	      { style: { 'display': 'inline-block' } },
+	      React.createElement(
+	        'a',
+	        { href: 'javascript:void(0)', onClick: this.openModal },
+	        'Login'
+	      ),
+	      React.createElement(
+	        Modal,
+	        { show: this.state.showModal, onHide: this.closeModal, animation: false },
+	        React.createElement(
+	          Modal.Header,
+	          { closeButton: true },
+	          React.createElement(
+	            Modal.Title,
+	            null,
+	            'Log In'
+	          )
+	        ),
+	        React.createElement(
+	          Modal.Body,
+	          null,
+	          this.state.errors.length >= 1 ? React.createElement(
+	            Alert,
+	            { bsStyle: 'danger' },
+	            this.state.errors
+	          ) : "",
+	          React.createElement(
+	            'label',
+	            null,
+	            'Username',
+	            React.createElement(Input, { type: 'text', valueLink: this.linkState('name') })
+	          ),
+	          React.createElement('br', null),
+	          React.createElement(
+	            'label',
+	            null,
+	            'Password',
+	            React.createElement(Input, { onKeyUp: this.enterSubmit, type: 'password', valueLink: this.linkState('password') })
+	          ),
+	          React.createElement('br', null),
+	          React.createElement(
+	            Button,
+	            { onClick: this.login },
+	            'Submit'
+	          )
+	        )
+	      )
+	    );
+	  }
+	});
+
+	module.exports = Login;
+
+/***/ },
+/* 373 */
+/***/ function(module, exports, __webpack_require__) {
+
+	'use strict';
+
+	var ReactDOM = __webpack_require__(1);
+	var React = __webpack_require__(147);
+	var LinkedStateMixin = __webpack_require__(270);
+
+	var Api = __webpack_require__(265);
+	var Modal = __webpack_require__(275);
+	var Button = __webpack_require__(208);
+	var Input = __webpack_require__(359);
+	var Alert = __webpack_require__(369);
+
+	var SessionStore = __webpack_require__(240);
+
+	var Register = React.createClass({
+	  displayName: 'Register',
+
+	  mixins: [LinkedStateMixin],
+	  getInitialState: function () {
+	    return { name: '', password: '', errors: '' };
+	  },
+
+	  closeModal: function () {
+	    this.setState({ showModal: false, errors: '' });
+	  },
+
+	  openModal: function () {
+	    this.setState({ showModal: true });
+	  },
+
+	  login: function () {
+	    Api.register(this.state.name, this.state.password);
+	    this.listenerToken = SessionStore.addListener(this._getErrors);
+	  },
+
+	  _getErrors: function () {
+	    if (SessionStore.getError() != '') {
+	      this.setState({ errors: SessionStore.getError() });
+	    } else {
+	      this.listenerToken.remove();
+	    }
+	  },
+
+	  componentDidMount() {
+	    this.listenerToken = SessionStore.addListener(this._getErrors);
+	  },
+
+	  componentWillUnmount() {
+	    this.listenerToken.remove();
+	  },
+
+	  enterSubmit: function (event) {
+	    if (event.keyCode === 13) {
+	      this.login();
+	    }
+	  },
+
+	  render: function () {
+	    return React.createElement(
+	      'div',
+	      { style: { 'display': 'inline-block' } },
+	      React.createElement(
+	        'a',
+	        { href: 'javascript:void(0)', onClick: this.openModal },
+	        'Register'
+	      ),
+	      React.createElement(
+	        Modal,
+	        { show: this.state.showModal, onHide: this.closeModal, animation: false },
+	        React.createElement(
+	          Modal.Header,
+	          { closeButton: true },
+	          React.createElement(
+	            Modal.Title,
+	            null,
+	            'Register'
+	          )
+	        ),
+	        React.createElement(
+	          Modal.Body,
+	          null,
+	          this.state.errors.length >= 1 ? React.createElement(
+	            Alert,
+	            { bsStyle: 'danger' },
+	            this.state.errors
+	          ) : "",
+	          React.createElement(
+	            'label',
+	            null,
+	            'Username',
+	            React.createElement(Input, { type: 'text', valueLink: this.linkState('name') })
+	          ),
+	          React.createElement('br', null),
+	          React.createElement(
+	            'label',
+	            null,
+	            'Password',
+	            React.createElement(Input, { onKeyUp: this.enterSubmit, type: 'password', valueLink: this.linkState('password') })
+	          ),
+	          React.createElement('br', null),
+	          React.createElement(
+	            Button,
+	            { onClick: this.login },
+	            'Submit'
+	          )
+	        )
+	      )
+	    );
+	  }
+	});
+
+	module.exports = Register;
 
 /***/ }
 /******/ ]);

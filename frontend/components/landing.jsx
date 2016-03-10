@@ -5,6 +5,9 @@ var Api = require('../util/api.js');
 var ApiActions = require('../actions/api_actions.js');
 var SessionStore = require('../stores/session_store.js');
 
+var Login = require('./login.jsx');
+var Register = require('./register.jsx');
+
 
 var Landing = React.createClass({
 
